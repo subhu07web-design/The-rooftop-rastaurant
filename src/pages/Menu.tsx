@@ -18,6 +18,14 @@ export default function Menu({ addToCart, cart, removeFromCart, updateQuantity }
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    message: ''
+  });
 
   const categories = [
     'All', 
@@ -43,10 +51,40 @@ export default function Menu({ addToCart, cart, removeFromCart, updateQuantity }
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  const handleCheckout = (e: React.FormEvent) => {
+  const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
-    setOrderComplete(true);
-    toast.success("Order placed successfully!");
+    setIsSubmitting(true);
+
+    const orderData = {
+      ...formData,
+      product: cart.map(item => `${item.name} (x${item.quantity})`).join(', '),
+      price: cartTotal,
+      quantity: cart.reduce((sum, item) => sum + item.quantity, 0),
+      timestamp: new Date().toLocaleString()
+    };
+
+    try {
+      // Using no-cors because Google Apps Script redirects can cause CORS issues in some browsers
+      // and we don't necessarily need to read the response body for a simple submission.
+      await fetch('https://script.google.com/macros/s/AKfycbyAlzz3-N82AKiQAwi-l8YPcy1lFHaC-55urhGGLEYmeKuQBCyBpJNIjripdcisqo_Zlg/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+      
+      setOrderComplete(true);
+      toast.success("Order placed successfully!");
+      // Reset form
+      setFormData({ name: '', phone: '', email: '', address: '', message: '' });
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -242,18 +280,64 @@ export default function Menu({ addToCart, cart, removeFromCart, updateQuantity }
                   <form onSubmit={handleCheckout} className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase text-white/40">Full Name</label>
-                      <input required type="text" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all" placeholder="John Doe" />
+                      <input 
+                        required 
+                        type="text" 
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all" 
+                        placeholder="John Doe" 
+                      />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase text-white/40">Phone Number</label>
-                      <input required type="tel" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all" placeholder="+91 00000 00000" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase text-white/40">Phone Number</label>
+                        <input 
+                          required 
+                          type="tel" 
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all" 
+                          placeholder="+91 00000 00000" 
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase text-white/40">Email Address</label>
+                        <input 
+                          required 
+                          type="email" 
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all" 
+                          placeholder="john@example.com" 
+                        />
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase text-white/40">Delivery Address</label>
-                      <textarea required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all h-24" placeholder="Your full address..."></textarea>
+                      <textarea 
+                        required 
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all h-20" 
+                        placeholder="Your full address..."
+                      ></textarea>
                     </div>
-                    <button type="submit" className="w-full bg-primary text-black py-4 rounded-xl font-bold hover:bg-accent transition-all mt-4">
-                      Place Order
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase text-white/40">Special Message/Notes</label>
+                      <textarea 
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all h-20" 
+                        placeholder="Any special instructions for your order?"
+                      ></textarea>
+                    </div>
+                    <button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="w-full bg-primary text-black py-4 rounded-xl font-bold hover:bg-accent transition-all mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? 'Processing...' : 'Place Order'}
                     </button>
                   </form>
                 </>
