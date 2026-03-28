@@ -6,9 +6,42 @@ import { toast } from 'sonner';
 import SEO from '../components/SEO';
 
 export default function Contact() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [formData, setFormData] = React.useState({
+    name: '',
+    email: '',
+    subject: 'General Inquiry',
+    message: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent! We'll get back to you soon.");
+    setIsSubmitting(true);
+
+    const contactData = {
+      ...formData,
+      type: 'Contact Message',
+      timestamp: new Date().toLocaleString()
+    };
+
+    try {
+      await fetch('https://script.google.com/macros/s/AKfycbxPOu0YfWHu00eOLQGz9ufxWiI3_ucx9O_MPYi4Wjcn8w6TcF7elbVyMP_ZvUtZbcnb9w/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: JSON.stringify(contactData),
+      });
+      
+      toast.success("Message sent! We'll get back to you soon.");
+      setFormData({ name: '', email: '', subject: 'General Inquiry', message: '' });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -76,28 +109,56 @@ export default function Contact() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase text-white/40">Name</label>
-                  <input required type="text" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 focus:border-primary outline-none transition-all" placeholder="Your Name" />
+                  <input 
+                    required 
+                    type="text" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 focus:border-primary outline-none transition-all" 
+                    placeholder="Your Name" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase text-white/40">Email</label>
-                  <input required type="email" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 focus:border-primary outline-none transition-all" placeholder="your@email.com" />
+                  <input 
+                    required 
+                    type="email" 
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 focus:border-primary outline-none transition-all" 
+                    placeholder="your@email.com" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase text-white/40">Subject</label>
-                <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 focus:border-primary outline-none transition-all">
-                  <option className="bg-secondary">General Inquiry</option>
-                  <option className="bg-secondary">Table Booking</option>
-                  <option className="bg-secondary">Event Hosting</option>
-                  <option className="bg-secondary">Feedback</option>
+                <select 
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 focus:border-primary outline-none transition-all"
+                >
+                  <option className="bg-secondary" value="General Inquiry">General Inquiry</option>
+                  <option className="bg-secondary" value="Table Booking">Table Booking</option>
+                  <option className="bg-secondary" value="Event Hosting">Event Hosting</option>
+                  <option className="bg-secondary" value="Feedback">Feedback</option>
                 </select>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase text-white/40">Message</label>
-                <textarea required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 focus:border-primary outline-none transition-all h-32" placeholder="How can we help you?"></textarea>
+                <textarea 
+                  required 
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 focus:border-primary outline-none transition-all h-32" 
+                  placeholder="How can we help you?"
+                ></textarea>
               </div>
-              <button type="submit" className="w-full bg-primary text-black py-4 rounded-xl font-bold hover:bg-accent transition-all flex items-center justify-center gap-2">
-                <Send className="w-5 h-5" /> Send Message
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-primary text-black py-4 rounded-xl font-bold hover:bg-accent transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <Send className="w-5 h-5" /> {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
             </form>
           </motion.div>

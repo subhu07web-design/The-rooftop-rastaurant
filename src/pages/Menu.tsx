@@ -72,17 +72,15 @@ export default function Menu({ addToCart, cart, removeFromCart, updateQuantity }
     console.log('Submitting order data:', orderData);
 
     try {
-      // Using URLSearchParams for better compatibility with Google Apps Script doPost(e)
-      // which often expects form-encoded data in e.parameter.
-      const params = new URLSearchParams();
-      Object.entries(orderData).forEach(([key, value]) => {
-        params.append(key, value.toString());
-      });
-
-      await fetch('https://script.google.com/macros/s/AKfycbyAlzz3-N82AKiQAwi-l8YPcy1lFHaC-55urhGGLEYmeKuQBCyBpJNIjripdcisqo_Zlg/exec', {
+      // Using text/plain with no-cors to send JSON data to GAS without triggering a CORS preflight.
+      // Modern GAS doPost(e) can parse this from e.postData.contents.
+      await fetch('https://script.google.com/macros/s/AKfycbxPOu0YfWHu00eOLQGz9ufxWiI3_ucx9O_MPYi4Wjcn8w6TcF7elbVyMP_ZvUtZbcnb9w/exec', {
         method: 'POST',
         mode: 'no-cors',
-        body: params,
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: JSON.stringify(orderData),
       });
       
       setOrderComplete(true);
