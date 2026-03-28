@@ -1,0 +1,5 @@
+{
+  "name": "The Rooftop Restaurant",
+  "description": "Elegant rooftop dining in North Lakhimpur, Assam. Experience the best food with a view.",
+  "requestFramePermissions": ["geolocation"]
+}
