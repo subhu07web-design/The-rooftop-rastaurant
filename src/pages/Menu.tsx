@@ -55,24 +55,34 @@ export default function Menu({ addToCart, cart, removeFromCart, updateQuantity }
     e.preventDefault();
     setIsSubmitting(true);
 
+    console.log('Current form data state:', formData);
+    
     const orderData = {
-      ...formData,
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      address: formData.address,
+      message: formData.message,
       product: cart.map(item => `${item.name} (x${item.quantity})`).join(', '),
       price: cartTotal,
       quantity: cart.reduce((sum, item) => sum + item.quantity, 0),
       timestamp: new Date().toLocaleString()
     };
 
+    console.log('Submitting order data:', orderData);
+
     try {
-      // Using no-cors because Google Apps Script redirects can cause CORS issues in some browsers
-      // and we don't necessarily need to read the response body for a simple submission.
+      // Using URLSearchParams for better compatibility with Google Apps Script doPost(e)
+      // which often expects form-encoded data in e.parameter.
+      const params = new URLSearchParams();
+      Object.entries(orderData).forEach(([key, value]) => {
+        params.append(key, value.toString());
+      });
+
       await fetch('https://script.google.com/macros/s/AKfycbyAlzz3-N82AKiQAwi-l8YPcy1lFHaC-55urhGGLEYmeKuQBCyBpJNIjripdcisqo_Zlg/exec', {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
+        body: params,
       });
       
       setOrderComplete(true);
