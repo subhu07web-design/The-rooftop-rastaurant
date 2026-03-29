@@ -37,8 +37,8 @@ export default function About() {
           >
             <div className="aspect-square rounded-3xl overflow-hidden border border-white/10">
               <img 
-                src="https://picsum.photos/seed/restaurant-about/800/800" 
-                alt="Restaurant Interior" 
+                src="https://i.postimg.cc/gkvbYPMm/rooftop-image-3.jpg" 
+                alt="Our Story" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
