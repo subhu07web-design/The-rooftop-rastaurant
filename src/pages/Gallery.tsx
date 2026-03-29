@@ -4,14 +4,13 @@ import SEO from '../components/SEO';
 
 export default function Gallery() {
   const images = [
-    { src: 'https://picsum.photos/seed/food1/800/600', title: 'Signature Starters' },
-    { src: 'https://picsum.photos/seed/ambience1/800/600', title: 'Rooftop View' },
-    { src: 'https://picsum.photos/seed/food2/800/600', title: 'Main Course' },
-    { src: 'https://picsum.photos/seed/ambience2/800/600', title: 'Night Vibe' },
-    { src: 'https://picsum.photos/seed/food3/800/600', title: 'Refreshing Drinks' },
-    { src: 'https://picsum.photos/seed/ambience3/800/600', title: 'Outdoor Seating' },
-    { src: 'https://picsum.photos/seed/food4/800/600', title: 'Buffet Spread' },
-    { src: 'https://picsum.photos/seed/ambience4/800/600', title: 'Event Setup' },
+    { src: 'https://i.postimg.cc/50nz6Djt/rooftop-image4.jpg', title: 'Rooftop Ambience' },
+    { src: 'https://delivery.pixelbin.io/predictions/outputs/30d/sr/upscale/019d3782-1701-7eef-97dd-13274d6db845/result_0.jpeg', title: 'Rooftop Dining' },
+    { src: 'https://delivery.pixelbin.io/predictions/outputs/30d/sr/upscale/019d3784-2db7-7bb9-9775-98cc2109d6fc/result_0.jpeg', title: 'Rooftop Atmosphere' },
+    { src: 'https://i.postimg.cc/6qBN11h0/rooftop-image5.webp', title: 'Sunset View' },
+    { src: 'https://i.postimg.cc/mD2wXYF0/rooftop-image-6.webp', title: 'City Skyline' },
+    { src: 'https://i.postimg.cc/Y2TP9PFq/rooftop-image-7.webp', title: 'Rooftop Evening' },
+    { src: 'https://i.postimg.cc/MTSTq5Dc/rooftop-img-8.jpg', title: 'Rooftop Night' },
   ];
 
   return (
